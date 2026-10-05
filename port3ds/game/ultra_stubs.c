@@ -42,3 +42,4 @@ void osCreateThread(OSThread* t, OSId id, void (*entry)(void*), void* arg, void*
 void osStartThread(OSThread* t) {}
 void osSetThreadPri(OSThread* t, OSPri pri) { if (t) t->priority = pri; }
 void osStopThread(OSThread* t) {}
+
