@@ -35,4 +35,10 @@ void osInvalDCache(void* a, s32 n) {}
 void osInvalICache(void* a, s32 n) {}
 s32 osEPiReadIo(OSPiHandle* h, u32 addr, u32* data) { *data = 0; return 0; }
 s32 osEPiWriteIo(OSPiHandle* h, u32 addr, u32 data) { return 0; }
-
+void osCreateThread(OSThread* t, OSId id, void (*entry)(void*), void* arg, void* sp, OSPri pri) {
+    t->priority = pri;
+    t->id = id;
+}
+void osStartThread(OSThread* t) {}
+void osSetThreadPri(OSThread* t, OSPri pri) { if (t) t->priority = pri; }
+void osStopThread(OSThread* t) {}
