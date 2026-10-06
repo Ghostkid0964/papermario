@@ -1,5 +1,6 @@
 #include <3ds.h>
 #include <stdio.h>
+extern void* gGameStatePtr;
 extern unsigned int osGetCount(void);
 int main(void) {
     gfxInitDefault();
