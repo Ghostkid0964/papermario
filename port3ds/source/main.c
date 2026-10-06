@@ -3,6 +3,7 @@
 #include <string.h>
 
 extern unsigned int osGetCount(void);
+extern void nuPiReadRom(u32 romAddr, void *buffer, u32 size);
 
 static FILE *gGameRom;
 static long gGameRomSize;
@@ -68,6 +69,14 @@ int main(void) {
     printf("osGetCount: %u\n", osGetCount());
 
     if (plat3ds_rom_open()) {
+        u8 readHeader[4];
+        nuPiReadRom(0, readHeader, sizeof(readHeader));
+        if (readHeader[0] == 0x80 && readHeader[1] == 0x37 &&
+            readHeader[2] == 0x12 && readHeader[3] == 0x40) {
+            printf("nuPiReadRom: OK\n");
+        } else {
+            printf("nuPiReadRom: FAILED\n");
+        }
         printf("baserom.z64: OK (%lu bytes)\n", (unsigned long)gGameRomSize);
     } else {
         printf("ROM missing or invalid.\n");
