@@ -6,7 +6,7 @@ FLAGS="-std=gnu99 -c -w -include stddef.h -I ver/us/include -I ver/us/build/incl
 cp include/include_asset.h /tmp/ia.bak
 sed -i 's/@object/%object/g' include/include_asset.h
 rm -f port3ds/gobj/*.o
-for f in port3ds/game/ultra_stubs.c src/cam_math.c src/animator.c; do
+for f in port3ds/game/ultra_stubs.c src/cam_math.c src/animator.c src/background.c src/collision.c src/curtains.c src/draw_box.c; do
   arm-none-eabi-gcc $FLAGS $f -o port3ds/gobj/$(basename $f).o || echo "FAIL $f"
 done
 cp /tmp/ia.bak include/include_asset.h
