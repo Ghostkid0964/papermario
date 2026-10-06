@@ -6,7 +6,7 @@ FLAGS="-std=gnu99 -c -w -include stddef.h -I ver/us/include -I ver/us/build/incl
 cp include/include_asset.h /tmp/ia.bak
 sed -i 's/@object/%object/g' include/include_asset.h
 rm -f port3ds/gobj/*.o
-for f in port3ds/game/ultra_stubs.c $(ls src/*.c | grep -v -E "titlemenu|level_up_letters|starpoint_") $(find src/common src/entity src/audio src/evt src/pause src/filemenu -name "*.c" ! -name "*.inc.c" ! -name "pause_gfx_*" ! -name "filemenu_selectlanguage.c" ! -path "src/audio/core/system.c"); do
+for f in port3ds/game/ultra_stubs.c $(ls src/*.c | grep -v -E "titlemenu|level_up_letters|starpoint_") $(find src/common src/entity src/audio src/evt src/pause src/filemenu -name "*.c" ! -name "*.inc.c" ! -name "pause_gfx_*" ! -name "filemenu_selectlanguage.c" ! -path "src/audio/core/system.c"); dogrep -nE '(engine4|engine1|evt|entity|engine2|font_width)_(ROM_START|ROM_END|VRAM)' ver/us/build/include/ld_addrs.h
   arm-none-eabi-gcc $FLAGS $f -o port3ds/gobj/$(basename $f).o || echo "FAIL $f"
 done
 cp /tmp/ia.bak include/include_asset.h
