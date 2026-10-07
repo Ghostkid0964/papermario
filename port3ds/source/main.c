@@ -4,6 +4,7 @@
 
 extern unsigned int osGetCount(void);
 extern void nuPiReadRom(u32 romAddr, void *buffer, u32 size);
+extern void boot3ds_init(void);
 
 static FILE *gGameRom;
 static long gGameRomSize;
@@ -23,14 +24,22 @@ static int plat3ds_rom_open(void) {
     if (fseek(gGameRom, 0, SEEK_END) != 0) {
         goto fail;
     }
+
     gGameRomSize = ftell(gGameRom);
-    if (gGameRomSize < 0x40 || fseek(gGameRom, 0, SEEK_SET) != 0) {
+
+    if (gGameRomSize < 0x40 ||
+        fseek(gGameRom, 0, SEEK_SET) != 0) {
         goto fail;
     }
+
     if (fread(header, 1, sizeof(header), gGameRom) != sizeof(header)) {
         goto fail;
     }
-    if (header[0] != 0x80 || header[1] != 0x37 || header[2] != 0x12 || header[3] != 0x40) {
+
+    if (header[0] != 0x80 ||
+        header[1] != 0x37 ||
+        header[2] != 0x12 ||
+        header[3] != 0x40) {
         goto fail;
     }
 
@@ -49,7 +58,9 @@ void nuPiReadRom(u32 romAddr, void *buffer, u32 size) {
     if (size == 0) {
         return;
     }
-    if (gGameRom == NULL || romAddr > (u32)gGameRomSize ||
+
+    if (gGameRom == NULL ||
+        romAddr > (u32)gGameRomSize ||
         size > (u32)gGameRomSize - romAddr ||
         fseek(gGameRom, (long)romAddr, SEEK_SET) != 0) {
         memset(buffer, 0, size);
@@ -57,27 +68,41 @@ void nuPiReadRom(u32 romAddr, void *buffer, u32 size) {
     }
 
     bytesRead = fread(buffer, 1, size, gGameRom);
+
     if (bytesRead != size) {
         memset((u8 *)buffer + bytesRead, 0, size - bytesRead);
     }
 }
 
+void boot3ds_progress(int step) {
+    printf("step %d ok\n", step);
+}
+
 int main(void) {
     gfxInitDefault();
     consoleInit(GFX_TOP, NULL);
+
     printf("Paper Mario 3DS port\n");
     printf("osGetCount: %u\n", osGetCount());
 
     if (plat3ds_rom_open()) {
         u8 readHeader[4];
+
         nuPiReadRom(0, readHeader, sizeof(readHeader));
-        if (readHeader[0] == 0x80 && readHeader[1] == 0x37 &&
-            readHeader[2] == 0x12 && readHeader[3] == 0x40) {
+
+        if (readHeader[0] == 0x80 &&
+            readHeader[1] == 0x37 &&
+            readHeader[2] == 0x12 &&
+            readHeader[3] == 0x40) {
             printf("nuPiReadRom: OK\n");
         } else {
             printf("nuPiReadRom: FAILED\n");
         }
-        printf("baserom.z64: OK (%lu bytes)\n", (unsigned long)gGameRomSize);
+
+        printf("baserom.z64: OK (%lu bytes)\n",
+               (unsigned long)gGameRomSize);
+
+        boot3ds_init();
     } else {
         printf("ROM missing or invalid.\n");
         printf("Copy your US .z64 to:\n");
@@ -87,6 +112,7 @@ int main(void) {
     while (aptMainLoop()) {
         gspWaitForVBlank();
         hidScanInput();
+
         if (hidKeysDown() & KEY_START) {
             break;
         }
@@ -95,6 +121,7 @@ int main(void) {
     if (gGameRom != NULL) {
         fclose(gGameRom);
     }
+
     gfxExit();
     return 0;
 }
