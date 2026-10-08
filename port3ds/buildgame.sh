@@ -2,7 +2,7 @@
 export PATH=$PATH:/opt/devkitpro/devkitARM/bin
 mkdir -p port3ds/gobj
 
-FLAGS="-std=gnu99 -c -w -fcommon -include stddef.h -I ver/us/include -I ver/us/build/include -I include -I include/PR -I src -I assets/us -DVERSION=us -DVERSION_US -D_LANGUAGE_C -DF3DEX_GBI_2 -D_FINALROM -D_MIPS_SZLONG=32 -DOLD_GCC -Wno-error=implicit-function-declaration -Wno-error=return-mismatch -march=armv6k -mtune=mpcore -mfloat-abi=hard"
+FLAGS="-std=gnu99 -c -w -mword-relocations -fcommon -include stddef.h -I ver/us/include -I ver/us/build/include -I include -I include/PR -I src -I assets/us -DVERSION=us -DVERSION_US -D_LANGUAGE_C -DF3DEX_GBI_2 -D_FINALROM -D_MIPS_SZLONG=32 -DOLD_GCC -Wno-error=implicit-function-declaration -Wno-error=return-mismatch -march=armv6k -mtune=mpcore -mfloat-abi=hard -mfpu=vfp -mtp=soft"
 
 cp include/include_asset.h /tmp/ia.bak
 sed -i 's/@object/%object/g' include/include_asset.h

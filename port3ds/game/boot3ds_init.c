@@ -8,6 +8,8 @@ extern void boot3ds_progress(int step);
 void boot3ds_init(void) {
     s32 i;
 
+    boot3ds_progress(0);
+
     gOverrideFlags = 0;
     gGameStatusPtr->unk_79 = 0;
     gGameStatusPtr->backgroundFlags = 0;

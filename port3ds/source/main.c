@@ -76,6 +76,9 @@ void nuPiReadRom(u32 romAddr, void *buffer, u32 size) {
 
 void boot3ds_progress(int step) {
     printf("step %d ok\n", step);
+    gfxFlushBuffers();
+    gfxSwapBuffers();
+    gspWaitForVBlank();
 }
 
 int main(void) {
@@ -101,6 +104,12 @@ int main(void) {
 
         printf("baserom.z64: OK (%lu bytes)\n",
                (unsigned long)gGameRomSize);
+
+        printf("main: %p\n", (void*)main);
+        printf("boot3ds_init: %p\n", (void*)boot3ds_init);
+        gfxFlushBuffers();
+        gfxSwapBuffers();
+        gspWaitForVBlank();
 
         boot3ds_init();
     } else {
