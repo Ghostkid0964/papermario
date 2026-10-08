@@ -1,137 +1,138 @@
 #include "common.h"
-#include "functions.h"
-#include "game_modes.h"
 
-extern s8 gGameStepDelayCount;
-extern void boot3ds_progress(int step);
+/* =========================================================
+ * BOOT CONFIGURATION
+ * =========================================================
+ *
+ * Change BOOT_STAGE to test different initialization levels.
+ *
+ * 2 = Game status
+ * 3 = Input
+ * 4 = Render/tasks/scripts
+ * 5 = Player status
+ */
 
-void boot3ds_init(void) {
-    s32 i;
+#define BOOT_STAGE 3
 
-    boot3ds_progress(0);
 
+/* =========================================================
+ * FORWARD DECLARATIONS
+ * ========================================================= */
+
+void boot3ds_progress(s32 step);
+
+
+/* =========================================================
+ * GAME STATUS
+ * ========================================================= */
+
+static void boot_init_game_status(void)
+{
     gOverrideFlags = 0;
-    gGameStatusPtr->unk_79 = 0;
-    gGameStatusPtr->backgroundFlags = 0;
-    gGameStatusPtr->musicEnabled = true;
-    gGameStatusPtr->healthBarsEnabled = true;
-    gGameStatusPtr->introPart = INTRO_PART_NONE;
-    gGameStatusPtr->demoBattleFlags = 0;
-    gGameStatusPtr->multiplayerEnabled = false;
-    gGameStatusPtr->altViewportOffset.x = -8;
-    gGameStatusPtr->altViewportOffset.y = 4;
-    gTimeFreezeMode = TIME_FREEZE_NONE;
-    gGameStatusPtr->debugQuizmo = 0;
-    gGameStatusPtr->unk_13C = 0;
-    gGameStepDelayCount = 5;
-    gGameStatusPtr->saveCount = 0;
+    gGameStatusPtr = &gGameStatus;
 
-    boot3ds_progress(1);
-
-    clear_input();
     boot3ds_progress(2);
+}
 
-    general_heap_create();
+
+/* =========================================================
+ * INPUT SYSTEM
+ * ========================================================= */
+
+static void boot_init_input(void)
+{
+    clear_input();
+
     boot3ds_progress(3);
+}
 
+
+/* =========================================================
+ * RENDER / TASK SYSTEM
+ * ========================================================= */
+
+static void boot_init_render_tasks(void)
+{
     clear_render_tasks();
-    boot3ds_progress(4);
 
+    boot3ds_progress(41);
+}
+
+
+/* =========================================================
+ * WORKER SYSTEM
+ * ========================================================= */
+
+static void boot_init_workers(void)
+{
     clear_worker_list();
-    boot3ds_progress(5);
 
+    boot3ds_progress(42);
+}
+
+
+/* =========================================================
+ * SCRIPT SYSTEM
+ * ========================================================= */
+
+static void boot_init_scripts(void)
+{
     clear_script_list();
-    boot3ds_progress(6);
 
-    create_cameras();
-    boot3ds_progress(7);
+    boot3ds_progress(43);
+}
 
+
+/* =========================================================
+ * PLAYER STATUS
+ * ========================================================= */
+
+static void boot_init_player_status(void)
+{
     clear_player_status();
-    boot3ds_progress(8);
 
-    spr_init_sprites(PLAYER_SPRITES_MARIO_WORLD);
-    boot3ds_progress(9);
+    boot3ds_progress(5);
+}
 
-    clear_entity_models();
-    boot3ds_progress(10);
 
-    clear_animator_list();
-    boot3ds_progress(11);
+/* =========================================================
+ * MAIN BOOT INITIALIZATION
+ * ========================================================= */
 
-    clear_model_data();
-    boot3ds_progress(12);
+void boot3ds_init(void)
+{
+    /* -----------------------------------------------------
+     * Stage 2: Game status
+     * ----------------------------------------------------- */
 
-    clear_sprite_shading_data();
-    boot3ds_progress(13);
+    boot_init_game_status();
 
-    reset_background_settings();
-    boot3ds_progress(14);
 
-    clear_character_set();
-    boot3ds_progress(15);
+    /* -----------------------------------------------------
+     * Stage 3: Input
+     * ----------------------------------------------------- */
 
-    clear_printers();
-    boot3ds_progress(16);
+#if BOOT_STAGE >= 3
+    boot_init_input();
+#endif
 
-    clear_game_mode();
-    boot3ds_progress(17);
 
-    clear_npcs();
-    boot3ds_progress(18);
+    /* -----------------------------------------------------
+     * Stage 4: Render / workers / scripts
+     * ----------------------------------------------------- */
 
-    hud_element_clear_cache();
-    boot3ds_progress(19);
+#if BOOT_STAGE >= 4
+    boot_init_render_tasks();
+    boot_init_workers();
+    boot_init_scripts();
+#endif
 
-    clear_trigger_data();
-    boot3ds_progress(20);
 
-    clear_entity_data(false);
-    boot3ds_progress(21);
+    /* -----------------------------------------------------
+     * Stage 5: Player status
+     * ----------------------------------------------------- */
 
-    clear_player_data();
-    boot3ds_progress(22);
-
-    init_encounter_status();
-    boot3ds_progress(23);
-
-    clear_screen_overlays();
-    boot3ds_progress(24);
-
-    clear_effect_data();
-    boot3ds_progress(25);
-
-    clear_saved_variables();
-    boot3ds_progress(26);
-
-    clear_item_entity_data();
-    boot3ds_progress(27);
-
-    bgm_reset_sequence_players();
-    boot3ds_progress(28);
-
-    reset_ambient_sounds();
-    boot3ds_progress(29);
-
-    sfx_clear_sounds();
-    boot3ds_progress(30);
-
-    clear_windows();
-    boot3ds_progress(31);
-
-    initialize_curtains();
-    boot3ds_progress(32);
-
-    poll_rumble();
-    boot3ds_progress(33);
-
-    for (i = 0; i < ARRAY_COUNT(gGameStatusPtr->holdRepeatInterval); i++) {
-        gGameStatusPtr->holdRepeatInterval[i] = 3;
-        gGameStatusPtr->holdDelayTime[i] = 12;
-    }
-
-    boot3ds_progress(34);
-
-    gOverrideFlags |= GLOBAL_OVERRIDES_DISABLE_DRAW_FRAME;
-    set_game_mode(GAME_MODE_STARTUP);
-    boot3ds_progress(35);
+#if BOOT_STAGE >= 5
+    boot_init_player_status();
+#endif
 }
